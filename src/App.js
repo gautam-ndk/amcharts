@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -12,21 +11,13 @@ class App extends Component {
   constructor(){
     super();
     this.updateData = this.updateData.bind(this);
+    this.computeRandomData = this.computeRandomData.bind(this);
   }
 
   componentDidMount() {
     let chart = am4core.create("chartdiv", am4charts.XYChart);
-
     chart.paddingRight = 20;
-
-    let data = [];
-    let visits = 10;
-    for (let i = 1; i < 366; i++) {
-      visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-      data.push({ date: new Date(2018, 0, i), name: "name" + i, value: visits });
-    }
-
-    chart.data = data;
+    chart.data = this.computeRandomData();
 
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
@@ -42,9 +33,10 @@ class App extends Component {
     series.tooltipText = "{valueY.value}";
     chart.cursor = new am4charts.XYCursor();
 
-    let scrollbarX = new am4charts.XYChartScrollbar();
-    scrollbarX.series.push(series);
-    chart.scrollbarX = scrollbarX;
+    // Uncomment the below 3 lines to show the Scrollbar(Similar to date filter in Chartio)
+    // let scrollbarX = new am4charts.XYChartScrollbar();
+    // scrollbarX.series.push(series);
+    // chart.scrollbarX = scrollbarX;
 
     this.chart = chart;
   }
@@ -55,7 +47,7 @@ class App extends Component {
     }
   }
 
-  updateData() {
+  computeRandomData(){
     let data = [];
     let visits = 10;
 
@@ -63,14 +55,18 @@ class App extends Component {
       visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
       data.push({ date: new Date(2018, 0, i), name: "name" + i, value: visits });
     }
+    return data;
+  }
 
-    this.chart.data = data;
+  // We will have to rely on componentDidUpdate if the props are coming from api response & then update the chart.data like below.
+  updateData() {
+    this.chart.data = this.computeRandomData();
   }
 
   render() {
     return (
       <React.Fragment>
-        <div id="chartdiv" style={{ width: "100%", height: "500px" }}></div>
+        <div id="chartdiv" style={{ width: "80%", height: "700px" }}></div>
         <button onClick={() => {
           this.updateData();
         }}>Click to update the data</button>
